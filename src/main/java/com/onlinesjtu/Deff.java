@@ -1,9 +1,5 @@
 package com.onlinesjtu;
 
-import com.alibaba.fastjson.JSON;
-
-import java.util.Map;
-
 public class Deff {
 
 	public static void main(String[] args) {
@@ -27,12 +23,47 @@ public class Deff {
 		//        s2 = s.substring(2, 5);
 		//        System.out.println(s1 + s2);
 
-		String sss = "{\"account\":\"leads_catalyst_prod\",\"id\":\"18018616088\",\"seq\":\"12480\",\"type\":\"mobile\",\"infoJson\":\"{\\\"mobile\\\":\\\"...\\\",\\\"lead_time\\\":\\\"...\\\",\\\"name\\\":\\\"...\\\"}\"}";
+		int i, j, a[] = {5, 9, 6, 8, 7};
+		for (i = 0; i < a.length - 1; i++) {
+			int k = i;
+			for (j = i; j < a.length; j++) {
+				if (a[j] < a[k]) {
+					k = j;
 
-		System.err.println(JSON.parseObject(sss, Map.class).get("infoJson"));
+					int temp = a[i];
+					a[i] = a[k];
+					a[k] = temp;
+				}
+			}
+			for (i = 0; i < a.length; i++) {
+				System.out.print(a[i] + "  ");
+			}
+			System.out.println();
 
-		int i = 6;
-		System.err.println("===" + (i += i - 1));
+
+		}
+
+
+	}
+
+	static int[][] transpose(int[][] a) {
+		int[][] b = new int[a.length][a.length];
+		for (int i = 0; i < a.length; i++) {
+			for (int j = 0; j < a[i].length; j++) {
+				b[i][j] = a[j][i];
+			}
+		}
+		return b;
+	}
+
+	static int searchMacNumIndex(int[] a) {
+		int maxIndex = 0;
+		for (int i = 1; i < a.length; i++) {
+			if (a[maxIndex] < a[i]) {
+				maxIndex = i;
+			}
+		}
+		return maxIndex;
 	}
 
 	static int deff(int x, int y) {

@@ -14,14 +14,16 @@ public class DownloadVideo {
 	private static String dataBaseUrl = "http://218.1.73.42/mooc/2020_1/computer/2323/%s.mp4";
 	private static String english3Url = "http://218.1.73.42/mooc/2020_1/english/2064/%s.mp4";
 	private static String maogaiUrl = "http://218.1.73.42/mooc/2020_1/guawang/1767/%s.mp4";
+	private static String xuewei_system_url = "http://218.1.73.42/mooc/2019_3/xuewei/723/%s.mp4";
+	private static String doc_system_url = "http://218.1.73.10/bachelor/download/%s.doc";
 	private static final int MAX_BUFFER_SIZE = 1000000;
 	private static ExecutorService ex = Executors.newFixedThreadPool(10);
 
 	public static void main(String[] args) {
-		for (int i = 1; i <= 46; i++) {
+		for (int i = 1; i <= 1000; i++) {
 			final int finalI = i;
-			ex.submit(() -> downloadVideo("D:\\onlinesjtu\\2020春\\05毛泽东思想和中国特色社会主义理论体系概论",
-					String.format(maogaiUrl, finalI)));
+			ex.submit(() -> downloadVideo("F:\\onlinesjtu\\test",
+					String.format(doc_system_url, finalI)));
 		}
 	}
 
