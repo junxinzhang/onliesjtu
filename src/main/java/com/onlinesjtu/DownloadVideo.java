@@ -4,11 +4,19 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DownloadVideo {
 
+	private static String _数据挖掘 = "http://218.1.73.42/mooc/2021_1/computer/2951/%s.mp4";
+	private static String _C = "http://218.1.73.42/mooc/2020_3/guawang/2839/%s.mp4";
+	private static String _嵌入式系统及应用 = "http://218.1.73.42/mooc/2020_3/common/2719/%s.mp4";
+	private static String _网络信息与安全 = "http://218.1.73.42/mooc/2020_3/computer/2501/%s.mp4";
+	private static String _数据库系统管理与维护 = "http://218.1.73.42/mooc/2020_3/guawang/2305/%s.mp4";
+	private static String _创新与创业管理 = "http://218.1.73.42/mooc/2020_3/manage/1224/%s.mp4";
+	private static String _可视化计算及应用 = "http://218.1.73.42/mooc/2020_3/guawang/758/%s.mp4";
 	private static String systemUrl = "http://218.1.73.42/mooc/2020_1/computer/1172/%s.mp4";
 	private static String javaUrl = "http://218.1.73.42/mooc/2020_1/computer/2469/%s.mp4";
 	private static String dataBaseUrl = "http://218.1.73.42/mooc/2020_1/computer/2323/%s.mp4";
@@ -19,11 +27,10 @@ public class DownloadVideo {
 	private static final int MAX_BUFFER_SIZE = 1000000;
 	private static ExecutorService ex = Executors.newFixedThreadPool(10);
 
-	public static void main(String[] args) {
-		for (int i = 1; i <= 1000; i++) {
+	public static void main(String[] args) throws ExecutionException, InterruptedException {
+		for (int i = 1; i <= 15; i++) {
 			final int finalI = i;
-			ex.submit(() -> downloadVideo("F:\\onlinesjtu\\test",
-					String.format(doc_system_url, finalI)));
+			ex.submit(() -> downloadVideo("F:\\onlinesjtu\\2021春\\01数据挖掘", String.format(_数据挖掘, finalI)));
 		}
 	}
 

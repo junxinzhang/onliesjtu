@@ -26,7 +26,7 @@ public class OnlinesjtuRepit {
 
 	public static void main(String[] args) throws IOException {
 
-		String url = "http://course.onlinesjtu.com/mod/quiz/review.php?attempt=1169917";
+		String url = "http://218.1.73.51/mod/quiz/review.php?attempt=1773753";
 		final String DEFAULT_USER = "xxxx";
 		final String DEFAULT_PASS = "xxx";
 
@@ -38,8 +38,9 @@ public class OnlinesjtuRepit {
 
 		CookieStore cookieStore = new BasicCookieStore();
 		BasicClientCookie cookie = new BasicClientCookie("MoodleSessionmoodle286",
-				"6il10id9h9nnl2l2gto7htr6b2");
-		cookie.setDomain("course.onlinesjtu.com");
+				"2seu1ft76fch1g1lc3330bp3v1");
+//		cookie.setDomain("course.onlinesjtu.com");
+		cookie.setDomain("218.1.73.51");
 		cookie.setPath("/");
 		cookieStore.addCookie(cookie);
 
@@ -50,11 +51,13 @@ public class OnlinesjtuRepit {
 		Document doc = Jsoup.parse(htmlTxt);
 		System.err.println(doc);
 		Elements ele = doc
-				.getElementsByClass("que multichoice deferredfeedback correct");
+				.getElementsByClass("que multichoice immediatefeedback correct");
 		PrintWriter printWriter = new PrintWriter(new File("homework.txt"));
 		for (Element element : ele) {
-			printWriter.println(element.text());
 			System.out.println(element.text());
+			printWriter.println(
+					element.getElementsByClass("qtext").text() + "\t" + element.getElementsByClass("rightanswer")
+							.text());
 		}
 		printWriter.flush();
 		printWriter.close();
