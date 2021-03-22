@@ -27,8 +27,8 @@ public class OnlinesjtuRepit {
 	public static void main(String[] args) throws IOException {
 
 		String url = "http://218.1.73.51/mod/quiz/review.php?attempt=1773753";
-		final String DEFAULT_USER = "xxxx";
-		final String DEFAULT_PASS = "xxx";
+		final String DEFAULT_USER = "719101390040";
+		final String DEFAULT_PASS = "phone1616";
 
 		HttpGet httpGet = new HttpGet(url);
 		String auth = DEFAULT_USER + ":" + DEFAULT_PASS;
