@@ -105,7 +105,8 @@ public class OnlinesjtuRepit {
 			CloseableHttpResponse response = client.execute(new HttpGet(url));
 			InputStream in = response.getEntity().getContent();
 
-			File file = new File(saveDir + "\\" + fileName);
+
+			File file = new File(mkdirs(saveDir) + "\\" + fileName);
 
 			FileOutputStream fos = new FileOutputStream(file);
 			int len;
@@ -121,6 +122,14 @@ public class OnlinesjtuRepit {
 			e.printStackTrace();
 		}
 		System.err.println(String.format("%s 处理完成", url));
+	}
+
+	public static String mkdirs(String path){
+		File file = new File(path);
+		if(!file.exists()){
+			file.mkdirs();
+		}
+		return path;
 	}
 
 }
