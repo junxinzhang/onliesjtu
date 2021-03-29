@@ -1,15 +1,31 @@
 package com.onlinesjtu;
 
-import java.io.*;
+import org.apache.commons.io.FileUtils;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DownloadVideo {
 
+	private static String _数据挖掘_pptx = "http://218.1.73.51/pluginfile.php/97298/mod_resource/content/4/%E7%AC%AC1%E7%AB%A0%20%E7%BB%AA%E8%AE%BA--%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E8%AF%BE%E7%A8%8B%E5%AF%BC%E5%AD%A6.pptx";
 	private static String _数据挖掘 = "http://218.1.73.42/mooc/2021_1/computer/2951/%s.mp4";
 	private static String _C = "http://218.1.73.42/mooc/2020_3/guawang/2839/%s.mp4";
 	private static String _嵌入式系统及应用 = "http://218.1.73.42/mooc/2020_3/common/2719/%s.mp4";
@@ -28,9 +44,10 @@ public class DownloadVideo {
 	private static ExecutorService ex = Executors.newFixedThreadPool(10);
 
 	public static void main(String[] args) throws ExecutionException, InterruptedException {
-		for (int i = 1; i <= 15; i++) {
+		for (int i = 51657; i <= 51657; i++) {
 			final int finalI = i;
 			ex.submit(() -> downloadVideo("F:\\onlinesjtu\\2021春\\01数据挖掘", String.format(_数据挖掘, finalI)));
+//			ex.submit(() -> downLoadFromUrl(_数据挖掘_pptx, "F:\\onlinesjtu\\2021春\\01数据挖掘", finalI + ".pptx"));
 		}
 	}
 
@@ -111,5 +128,167 @@ public class DownloadVideo {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static void downloadByCommonIO(String url, String saveDir, String fileName) {
+		try {
+			FileUtils.copyURLToFile(new URL(url), new File(saveDir, fileName));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 使用NIO下载文件，需要 jdk 1.4+
+	 *
+	 * @param url
+	 * @param saveDir
+	 * @param fileName
+	 */
+	public static void downloadByNIO(String url, String saveDir, String fileName) {
+		ReadableByteChannel rbc = null;
+		FileOutputStream fos = null;
+		FileChannel foutc = null;
+		try {
+			rbc = Channels.newChannel(new URL(url).openStream());
+			File file = new File(saveDir, fileName);
+			file.getParentFile().mkdirs();
+			fos = new FileOutputStream(file);
+			foutc = fos.getChannel();
+			foutc.transferFrom(rbc, 0, Long.MAX_VALUE);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (rbc != null) {
+				try {
+					rbc.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (foutc != null) {
+				try {
+					foutc.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * 使用NIO下载文件，需要 jdk 1.7+
+	 *
+	 * @param url
+	 * @param saveDir
+	 * @param fileName
+	 */
+	public static void downloadByNIO2(String url, String saveDir, String fileName) {
+		try (InputStream ins = new URL(url).openStream()) {
+			Path target = Paths.get(saveDir, fileName);
+			Files.createDirectories(target.getParent());
+			Files.copy(ins, target, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 使用传统io stream下载文件
+	 *
+	 * @param url
+	 * @param saveDir
+	 * @param fileName
+	 */
+	public static void downloadByIO(String url, String saveDir, String fileName) {
+		BufferedOutputStream bos = null;
+		InputStream is = null;
+		try {
+			byte[] buff = new byte[8192];
+			is = new URL(url).openStream();
+			File file = new File(saveDir, fileName);
+			file.getParentFile().mkdirs();
+			bos = new BufferedOutputStream(new FileOutputStream(file));
+			int count = 0;
+			while ((count = is.read(buff)) != -1) {
+				bos.write(buff, 0, count);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (bos != null) {
+				try {
+					bos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * 使用Byte Array获得stream下载文件
+	 *
+	 * @param urlStr
+	 * @param fileName
+	 * @param savePath
+	 * @throws IOException
+	 */
+	public static void downLoadFromUrl(String urlStr, String savePath, String fileName) {
+		try {
+			URL url = new URL(urlStr);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+			String toString = conn.getURL().toString();
+			fileName = toString.substring(toString.lastIndexOf('/') + 1);
+
+
+			//设置超时间为5秒
+			conn.setConnectTimeout(5 * 1000);
+			//防止屏蔽程序抓取而返回403错误
+			conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+
+			//得到输入流
+			InputStream input = conn.getInputStream();
+			//获取自己数组
+			byte[] getData = readInputStream(input);
+
+			//文件保存位置
+			File saveDir = new File(savePath);
+			if (!saveDir.exists()) {
+				saveDir.mkdir();
+			}
+			File file = new File(saveDir + File.separator + fileName);
+			FileOutputStream output = new FileOutputStream(file);
+			output.write(getData);
+			if (output != null) {
+				output.close();
+			}
+			if (input != null) {
+				input.close();
+			}
+			System.out.println("download success!!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static  byte[] readInputStream(InputStream inputStream) throws IOException {
+		byte[] buffer = new byte[10240];
+		int len = 0;
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		while((len = inputStream.read(buffer)) != -1) {
+			bos.write(buffer, 0, len);
+		}
+		bos.close();
+		return bos.toByteArray();
 	}
 }
