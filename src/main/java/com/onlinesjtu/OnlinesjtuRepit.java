@@ -2,14 +2,11 @@ package com.onlinesjtu;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.ConnectionConfig;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -36,30 +33,31 @@ public class OnlinesjtuRepit {
 
 	public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
 
-//		String url = "http://218.1.73.51/mod/quiz/review.php?attempt=1773753";
-		String url = "http://218.1.73.51/course/view.php?id=536&term=2021_1";
+		//		String url = "http://218.1.73.51/mod/quiz/review.php?attempt=1773753";
+				String url = "http://218.1.73.51/course/view.php?id=536&term=2021_1";
+//		String url = "http://218.1.73.51:82/course/view.php?id=44&term=2020_3";
 
-		final String DEFAULT_USER = "719101390040";
-		final String DEFAULT_PASS = "phone1616";
+		final String DEFAULT_USER = "xxx";
+		final String DEFAULT_PASS = "xxx";
 
 		HttpGet httpGet = new HttpGet(url);
 		String auth = DEFAULT_USER + ":" + DEFAULT_PASS;
 		byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
 		String authHeader = "Basic " + new String(encodedAuth);
 		httpGet.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+		String value = "MoodleSessionmoodle286=ckg2oma3v7ke7bcs0pb3d9jj26; MoodleSessionmoodle286last=tdbh22pkv8vbg4cqhi4d793qm7";
+		httpGet.addHeader("Cookie", value);
 
-		CookieStore cookieStore = new BasicCookieStore();
-		BasicClientCookie cookie = new BasicClientCookie("MoodleSessionmoodle286",
-				"ckg2oma3v7ke7bcs0pb3d9jj26");
-//		cookie.setDomain("course.onlinesjtu.com");
-		cookie.setDomain("218.1.73.51");
-		cookie.setPath("/");
-		cookieStore.addCookie(cookie);
+//		CookieStore cookieStore = new BasicCookieStore();
+//		BasicClientCookie cookie = new BasicClientCookie("MoodleSessionmoodle286", "ckg2oma3v7ke7bcs0pb3d9jj26");
+//		cookie.setDomain("218.1.73.51:82");
+//		cookie.setPath("/");
+//		cookieStore.addCookie(cookie);
 
 		CloseableHttpClient client = HttpClients.custom()
-				.setDefaultCookieStore(cookieStore)
-//				.setDefaultRequestConfig(RequestConfig.custom().build())
-//				.setRedirectStrategy(new LaxRedirectStrategy())
+				//				.setDefaultCookieStore(cookieStore)
+				//				.setDefaultRequestConfig(RequestConfig.custom().build())
+				//				.setRedirectStrategy(new LaxRedirectStrategy())
 				.disableRedirectHandling()
 				.setDefaultConnectionConfig(ConnectionConfig.custom().setCharset(StandardCharsets.UTF_8).build())
 				.build();
@@ -68,8 +66,7 @@ public class OnlinesjtuRepit {
 
 		Document doc = Jsoup.parse(htmlTxt);
 		System.err.println(doc);
-		Elements ele = doc
-				.getElementsByClass("activityinstance");
+		Elements ele = doc.getElementsByClass("activityinstance");
 		PrintWriter printWriter = new PrintWriter(new File("sjwajue.txt"));
 
 		for (Element element : ele) {
@@ -80,8 +77,9 @@ public class OnlinesjtuRepit {
 			printWriter.println(x);
 
 			HttpGet request = new HttpGet(attrHref);
+			request.addHeader("Cookie", value);
 			client = HttpClients.custom()
-					.setDefaultCookieStore(cookieStore)
+//					.setDefaultCookieStore(cookieStore)
 					.disableRedirectHandling()
 					.setDefaultConnectionConfig(ConnectionConfig.custom().setCharset(StandardCharsets.UTF_8).build())
 					.build();
@@ -90,17 +88,16 @@ public class OnlinesjtuRepit {
 				String redirectUrl = res.getFirstHeader("location").getValue();
 				System.err.println("redirectUrl: " + redirectUrl);
 
-				downloadFromUrl(client, redirectUrl, "F:\\onlinesjtu\\2021春", URLDecoder
+				downloadFromUrl(client, redirectUrl, "F:\\onlinesjtu\\2020秋\\01可视化计算及应用\\课件ppt", URLDecoder
 						.decode(redirectUrl.substring(redirectUrl.lastIndexOf("/") + 1), StandardCharsets.UTF_8.name()));
 			}
+
+			printWriter.flush();
+			printWriter.close();
+
+
+			client.close();
 		}
-
-
-		printWriter.flush();
-		printWriter.close();
-
-
-		client.close();
 	}
 
 	private static void downloadFromUrl(CloseableHttpClient client, String url, String saveDir, String fileName) {
@@ -119,12 +116,11 @@ public class OnlinesjtuRepit {
 			fos.flush();
 			fos.close();
 			in.close();
-//			client.close();
+			//			client.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		System.err.println(String.format("%s 处理完成", url));
 	}
-
 
 }
